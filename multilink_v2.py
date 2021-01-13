@@ -13,8 +13,8 @@ class MultiLinkBody():
 		self.l = 0.1
 		#self.qbar = torch.randn(self.n_nodes-1, dtype = dtype, requires_grad = True)
 		#self.q = torch.randn(self.n_nodes-1, self.n_targets, dtype= dtype, requires_grad = True)
-		self.qbar = torch.zeros(self.n_nodes-1, dtype = dtype, requires_grad = True)
-		self.q = torch.zeros(self.n_nodes-1, self.n_targets, dtype= dtype, requires_grad = True)
+		self.qbar = torch.zeros(self.n_nodes-1, dtype = dtype, requires_grad = True) #home pose angles
+		self.Q = torch.zeros(self.n_nodes-1, self.n_targets, dtype= dtype, requires_grad = True) # angles for all targets
 		self.verbose = verbose
 
 	def get_node_locs(self,q):
@@ -91,15 +91,15 @@ class MultiLinkBody():
 
 	def optimize(self,n_iter = 4000, lr = 1e-3):
 		for i in range(n_iter):
-			loss, indices = self.loss(self.q, self.qbar)
+			loss, indices = self.loss(self.Q, self.qbar)
 			if self.verbose: print(i+1,loss.item())
 			loss.backward()
 			with torch.no_grad():
-				self.q -= lr*self.q.grad
+				self.Q -= lr*self.Q.grad
 				self.qbar -= lr*self.qbar.grad
-				self.q.grad.zero_()
+				self.Q.grad.zero_()
 				self.qbar.grad.zero_()
-		return  self.q.detach().numpy(), self.qbar.detach().numpy(), loss.item(), indices
+		return  self.Q.detach().numpy(), self.qbar.detach().numpy(), loss.item(), indices
 
 
 
