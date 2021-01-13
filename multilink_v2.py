@@ -118,7 +118,7 @@ if __name__ =='__main__':
 						#[0.8, 0.7]])
 	node_budget = 10
 	sess = MultiLinkBody(targets = targets, n_nodes=node_budget)
-	sess.plot_configuration(sess.qbar.detach().numpy(),sess.q.detach().numpy())
+	sess.plot_configuration(sess.qbar.detach().numpy(),sess.Q.detach().numpy())
 	Q,qbar, loss, indices = sess.optimize()
 	np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
 	print('Home joint angles: ', qbar*180.0/np.pi)
