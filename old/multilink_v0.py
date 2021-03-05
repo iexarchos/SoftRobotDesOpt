@@ -84,35 +84,6 @@ class MultiLinkBody():
 				self.qbar.grad.zero_()
 		return self.l.detach().numpy(), self.q.detach().numpy(), self.qbar.detach().numpy(), loss.item()
 
-	def NOVAS(self, n_iter = 2000, n_samples = 100, sigma = 0.1):
-		dim = self.l.size()+self.q.size()+self.qbar.size()
-		l = self.l.detach().numpy()
-		q = self.q.detach().numpy()
-		qbar = self.qbar.detach().numpy()
-		qbar = qbar.reshape((self.n_nodes-1)*self.n_targets,)
-		mu = np.concatenate((l,q,qbar))
-		dim = len(mu)
-		for i in range(n_iter+1):
-			deltax = sigma*np.random.normal(size=(n_samp,dim))
-			x = mu[np.newaxis,:]+deltax
-			fx = -self.loss(x)
-			fx = fx - fx.min() # shape: (20,)
-			fx = fx/(fx.max() - fx.min())
-
-	# S = np.exp(fx)
-	# S = S/S.sum() # shape: (20,)
-
-			S = special.softmax(gamma*fx)
-
-			mu = mu + (S[:,np.newaxis]*deltax).sum(axis=0) # shape: (12288,) = dim
-			sigma = np.sqrt((S[:,np.newaxis]*deltax**2).sum(axis=0)+1e-8)
-
-	#bp()
-	
-			obj = self.loss(mu[np.newaxis,:])
-			if (i+1)%1==0:
-				print('Iter:{}, obj. value={:.3f}, avg. sigma={:.3e}'.format(i, np.squeeze(obj), sigma.mean()))
-
 
 
 
